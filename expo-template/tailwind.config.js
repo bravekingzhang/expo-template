@@ -9,3 +9,6 @@ module.exports = {
   darkMode: "class",
   plugins: [],
 }
+
+//https://github.com/nativewind/nativewind/issues/803
+// shadow-x-{n} and space-y-{n} not working 。注意，space 换成 gap

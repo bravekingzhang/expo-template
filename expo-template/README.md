@@ -1,5 +1,11 @@
 # 一个 Expo 开发模板
 
+
+## 特性
+
+- nativewind
+- expo-auth-session
+
 ## 安装依赖
 
 ```shell
