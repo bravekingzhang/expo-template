@@ -16,6 +16,7 @@ import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome6 } from "@expo/vector-icons";
 import Constants from 'expo-constants';
+import {api} from '@/lib/api'; // Assuming you have an api module
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -98,7 +99,6 @@ export default function Login() {
       const result = await githubPromptAsync();
       console.log('Prompt result:', result);
 
-      // 直接在这里处理成功响应
       if (result.type === 'success') {
         const { code } = result.params;
         console.log('Authorization Code:', code);
@@ -121,7 +121,11 @@ export default function Login() {
         console.log('Token Response:', data);
 
         if (data.access_token) {
-          await handleOAuthSuccess(data.access_token);
+          // 获取用户信息并保存到我们的系统中
+          const user = await api.auth.loginWithProvider('github', data.access_token);
+          await AsyncStorage.setItem('userToken', data.access_token);
+          await AsyncStorage.setItem('currentUser', JSON.stringify(user));
+          router.replace('/(tabs)/home');
         } else {
           console.error('No access token in response:', data);
           Alert.alert('Error', 'Failed to get access token');
