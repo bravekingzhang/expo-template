@@ -93,6 +93,18 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0.0"
+
+        splits {
+            abi {
+                enable true
+                reset()
+                //noinspection ChromeOsAbiSupport
+                include "arm64-v8a"
+                universalApk false
+            }
+            //  ./gradlew assembleDebug -PreactNativeArchitectures=arm64-v8a
+            //  ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a
+        }
     }
     signingConfigs {
         debug {

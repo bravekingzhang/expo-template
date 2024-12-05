@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,8 +15,11 @@ import * as Google from "expo-auth-session/providers/google";
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome6 } from "@expo/vector-icons";
+import Constants from 'expo-constants';
 
 WebBrowser.maybeCompleteAuthSession();
+
+const { githubClientId, githubClientSecret } = Constants.expoConfig?.extra || {};
 
 export default function Login() {
   const router = useRouter();
@@ -40,24 +43,93 @@ export default function Login() {
   const discovery = {
     authorizationEndpoint: 'https://github.com/login/oauth/authorize',
     tokenEndpoint: 'https://github.com/login/oauth/access_token',
-    revocationEndpoint: 'https://github.com/settings/connections/applications/<CLIENT_ID>',
+    revocationEndpoint: `https://github.com/settings/connections/applications/${githubClientId}`,
   };
 
-  const [githubRequest, githubResponse, githubPromptAsync] = useAuthRequest({
-    clientId: "Ov23lixGHnIHE3h8VwJn",
-    scopes: ['identity'],
-    redirectUri: makeRedirectUri({
-      scheme: 'myapp' // app.json 中的 scheme
-    }),
-  }, discovery);
+  const redirectUriGitHub = makeRedirectUri({
+    scheme: 'myapp',
+    path: 'login',
+    preferLocalhost: true,
+  });
+
+  console.log('OAuth Config:', {
+    clientId: githubClientId,
+    redirectUri: redirectUriGitHub,
+  });
+
+  const [githubRequest, githubResponse, githubPromptAsync] = useAuthRequest(
+    {
+      clientId: githubClientId,
+      scopes: ['user'],
+      redirectUri: redirectUriGitHub,
+    },
+    discovery
+  );
+
+  useEffect(() => {
+    console.log('Request State:', {
+      canAuthorize: githubRequest?.canAuthorize,
+      responseType: githubRequest?.responseType,
+      state: githubRequest?.state,
+    });
+  }, [githubRequest]);
+
+  useEffect(() => {
+    //BUG 处理 GitHub OAuth 响应，非常奇怪，这里没有，只能自己从githubPromptAsync 中获取
+    if (githubResponse) {
+      console.log('Auth Session Response:', githubResponse);
+    }
+  }, [githubResponse]);
 
   // 处理 OAuth 响应
   const handleOAuthSuccess = async (token: string) => {
     try {
-      await AsyncStorage.setItem("userToken", token);
-      router.replace("/(tabs)/home");
+      await AsyncStorage.setItem('userToken', token);
+      router.replace('/(tabs)/home');
     } catch (error) {
-      Alert.alert("登录失败", "请稍后重试");
+      console.error('Error saving token:', error);
+      Alert.alert('Error', 'Failed to save login information');
+    }
+  };
+
+  const handleGitHubLogin = async () => {
+    try {
+      console.log('Starting GitHub login...');
+      const result = await githubPromptAsync();
+      console.log('Prompt result:', result);
+
+      // 直接在这里处理成功响应
+      if (result.type === 'success') {
+        const { code } = result.params;
+        console.log('Authorization Code:', code);
+
+        // 使用授权码获取访问令牌
+        const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            client_id: githubClientId,
+            client_secret: githubClientSecret,
+            code,
+          }),
+        });
+
+        const data = await tokenResponse.json();
+        console.log('Token Response:', data);
+
+        if (data.access_token) {
+          await handleOAuthSuccess(data.access_token);
+        } else {
+          console.error('No access token in response:', data);
+          Alert.alert('Error', 'Failed to get access token');
+        }
+      }
+    } catch (error) {
+      console.error('GitHub login error:', error);
+      Alert.alert('Error', 'Failed to start GitHub login');
     }
   };
 
@@ -193,7 +265,7 @@ export default function Login() {
 
             <TouchableOpacity
               className="flex-row items-center justify-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-2xl py-4 border-2 border-gray-100 dark:border-gray-700"
-              onPress={() => githubPromptAsync()}
+              onPress={handleGitHubLogin}
               disabled={!githubRequest}
             >
               <FontAwesome6 name="github" size={22} color="#333" />

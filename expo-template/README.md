@@ -35,3 +35,9 @@ npx expo prebuild
 ```shell
 npx pod-install
 ```
+
+### oauth登陆配置
+
+- [配置 oauth](https://docs.expo.dev/guides/authentication/)
+- .env 中配置响应的 key,
+- 然后在 `app.config.js` 去增加相应的配置，已经有 github 的配置示例，可以参考。
