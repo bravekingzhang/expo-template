@@ -48,7 +48,7 @@ export default function Login() {
   };
 
   const redirectUriGitHub = makeRedirectUri({
-    scheme: 'myapp',
+    scheme: 'com.brzhang.expotemplate',
     path: 'login',
     preferLocalhost: true,
   });

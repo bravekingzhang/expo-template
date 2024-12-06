@@ -1,28 +1,16 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  ActivityIndicator,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, ScrollView, TouchableOpacity, Switch, Alert } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import useSWR from "swr";
-import { api } from "../../lib/api/index";
-import type { AppUser } from "../../types/user";
 import { FontAwesome6 } from "@expo/vector-icons";
+import UserProfile from "@/components/UserProfile";
+import { useThemeStore } from "@/store/theme";
+import i18n from "@/i18n";
 
 export default function Profile() {
   const router = useRouter();
-
-  // 获取用户信息
-  const {
-    data: user,
-    error,
-    isLoading,
-  } = useSWR<AppUser>("currentUser", api.user.getProfile);
+  const { colorScheme, language, toggleTheme, setLanguage } = useThemeStore();
+  const isDarkMode = colorScheme === 'dark';
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem("userToken");
@@ -30,129 +18,126 @@ export default function Profile() {
     router.replace("/login");
   };
 
-  if (isLoading) {
-    return (
-      <View className="flex-1 items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <ActivityIndicator size="large" color="#0284c7" />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View className="flex-1 items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
-        <Text className="text-red-500 text-center mb-4">
-          Failed to load profile
-        </Text>
-        <TouchableOpacity
-          onPress={handleLogout}
-          className="bg-sky-600 px-6 py-3 rounded-lg"
-        >
-          <Text className="text-white font-semibold">Logout</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  if (!user) {
-    return (
-      <View className="flex-1 items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <Text className="text-gray-600 dark:text-gray-400">
-          No profile data available
-        </Text>
-      </View>
-    );
-  }
-
-
+  const handleLanguageChange = () => {
+    const newLang = language === "en" ? "zh" : "en";
+    setLanguage(newLang);
+    i18n.locale = newLang;
+  };
 
   return (
     <ScrollView className="flex-1 bg-gray-50 dark:bg-gray-900">
-      {/* 顶部个人信息 */}
-      <View className="items-center pt-8 pb-6">
-        <View className="items-center">
-          <Image
-            source={{ uri: user.avatar }}
-            className="w-24 h-24 rounded-full mb-4"
-          />
-          <Text className="text-2xl font-bold text-gray-900 dark:text-white">
-            {user.name}
-          </Text>
-          {user.bio && (
-            <Text className="text-gray-600 dark:text-gray-300 text-center mt-2">
-              {user.bio}
-            </Text>
-          )}
-        </View>
+      <View className="p-4">
+        {/* 用户信息组件 */}
+        <UserProfile />
 
-        {/* 统计信息 */}
-        <View className="flex-row justify-around mb-6 bg-white dark:bg-gray-800 rounded-lg p-4">
-          <View className="items-center">
-            <Text className="text-lg font-bold text-gray-900 dark:text-white">
-              {user.postsCount}
-            </Text>
-            <Text className="text-gray-600 dark:text-gray-300">Posts</Text>
-          </View>
-          <View className="items-center">
-            <Text className="text-lg font-bold text-gray-900 dark:text-white">
-              {user.followersCount}
-            </Text>
-            <Text className="text-gray-600 dark:text-gray-300">Followers</Text>
-          </View>
-          <View className="items-center">
-            <Text className="text-lg font-bold text-gray-900 dark:text-white">
-              {user.followingCount}
-            </Text>
-            <Text className="text-gray-600 dark:text-gray-300">Following</Text>
-          </View>
-        </View>
-
-        {/* 用户信息列表 */}
+        {/* 设置区域 */}
         <View className="bg-white dark:bg-gray-800 rounded-lg p-4 mb-6">
-          {user.company && (
-            <View className="flex-row items-center mb-4">
+          <Text className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            {i18n.t("profile.settings")}
+          </Text>
+
+          {/* 暗黑模式设置 */}
+          <View className="flex-row items-center justify-between mb-4">
+            <View className="flex-row items-center">
               <FontAwesome6
-                name="building"
+                className="w-10"
+                name="moon"
                 size={20}
-                className="text-gray-500 dark:text-gray-400"
+                color={isDarkMode ? "#60a5fa" : "#6b7280"}
               />
               <Text className="ml-3 text-gray-700 dark:text-gray-300">
-                {user.company}
+                {i18n.t("profile.darkMode")}
               </Text>
             </View>
-          )}
-          {user.location && (
-            <View className="flex-row items-center mb-4">
+            <Switch thumbColor={isDarkMode ? "#60a5fa" : "#6b7280"} value={isDarkMode} onValueChange={toggleTheme} />
+          </View>
+
+          {/* 语言设置 */}
+          <TouchableOpacity
+            onPress={handleLanguageChange}
+            className="flex-row items-center justify-between mb-4"
+          >
+            <View className="flex-row items-center">
               <FontAwesome6
-                name="location-dot"
+                className="w-10"
+                name="language"
                 size={20}
-                className="text-gray-500 dark:text-gray-400"
+                color={isDarkMode ? "#60a5fa" : "#6b7280"}
               />
               <Text className="ml-3 text-gray-700 dark:text-gray-300">
-                {user.location}
+                {i18n.t("profile.language")}
               </Text>
             </View>
-          )}
-          {user.email && (
-            <View className="flex-row items-center mb-4">
+            <Text className="text-sky-600 dark:text-sky-400">
+              {language.toUpperCase()}
+            </Text>
+          </TouchableOpacity>
+
+          {/* 其他设置项 */}
+          <TouchableOpacity
+            className="flex-row items-center justify-between mb-4"
+            onPress={() => {
+              Alert.alert(
+                i18n.t("profile.settings"),
+                i18n.t("profile.settingsDescription")
+              );
+            }}
+          >
+            <View className="flex-row items-center">
               <FontAwesome6
-                name="envelope"
+                className="w-10"
+                name="bell"
                 size={20}
-                className="text-gray-500 dark:text-gray-400"
+                color={isDarkMode ? "#60a5fa" : "#6b7280"}
               />
               <Text className="ml-3 text-gray-700 dark:text-gray-300">
-                {user.email}
+                {i18n.t("profile.notifications")}
               </Text>
             </View>
-          )}
+            <FontAwesome6
+              name="chevron-right"
+              size={16}
+              color={isDarkMode ? "#60a5fa" : "#6b7280"}
+            />
+          </TouchableOpacity>
+
+          {/* 隐私设置 */}
+          <TouchableOpacity
+            className="flex-row items-center justify-between mb-4"
+            onPress={() => {
+              Alert.alert(
+                i18n.t("profile.privacy"),
+                i18n.t("profile.privacyDescription")
+              );
+            }}
+          >
+            <View className="flex-row items-center">
+              <FontAwesome6
+                className="w-10"
+                name="lock"
+                size={20}
+                color={isDarkMode ? "#60a5fa" : "#6b7280"}
+              />
+              <Text className="ml-3 text-gray-700 dark:text-gray-300">
+                {i18n.t("profile.privacy")}
+              </Text>
+            </View>
+            <FontAwesome6
+              name="chevron-right"
+              size={16}
+              color={isDarkMode ? "#60a5fa" : "#6b7280"}
+            />
+          </TouchableOpacity>
         </View>
 
         {/* 退出登录按钮 */}
         <TouchableOpacity
           onPress={handleLogout}
-          className="bg-sky-600 px-6 py-3 rounded-lg"
+          className="bg-sky-600 dark:bg-sky-700 px-6 py-3 rounded-lg w-full"
         >
-          <Text className="text-white font-semibold">Logout</Text>
+          <Text className="text-white font-semibold text-center">
+            {i18n.t("auth.logout")}
+          </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

@@ -1,0 +1,9 @@
+{
+  "entryPoints": ["./app", "./components", "./lib"],
+  "out": "docs",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeExternals": true,
+  "theme": "default",
+  "name": "Expo Template Documentation"
+}

@@ -1,12 +1,24 @@
 import { Tabs } from "expo-router";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useColorScheme } from 'react-native';
 
 export default function TabLayout() {
+  const colorScheme = useColorScheme();
+
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#007AFF",
-        tabBarInactiveTintColor: "gray",
+        tabBarActiveTintColor: colorScheme === 'dark' ? '#60A5FA' : '#007AFF',
+        tabBarInactiveTintColor: colorScheme === 'dark' ? '#6B7280' : '#9CA3AF',
+        tabBarStyle: {
+          backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+          borderTopColor: colorScheme === 'dark' ? '#374151' : '#E5E7EB',
+        },
+        headerStyle: {
+          backgroundColor: colorScheme === 'dark' ? '#1F2937' : '#FFFFFF',
+        },
+        headerTintColor: colorScheme === 'dark' ? '#F3F4F6' : '#111827',
+        headerShadowVisible: false,
       }}>
       <Tabs.Screen
         name="home"

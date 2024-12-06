@@ -48,7 +48,7 @@ export const api = {
   auth: {
     // 第三方登录
     loginWithProvider: async (provider: AuthProvider, accessToken: string) => {
-      // Mock: 直接返回转换后的用户数据
+      // Mock: 直接返回转换后的用户数据，实际应该调用后端 API，创建用户
       if (provider === 'github') {
         const githubUser = await githubApi.getUserInfo(accessToken);
         return createMockUser(githubUser);
@@ -60,7 +60,7 @@ export const api = {
   user: {
     // 获取当前用户信息
     getProfile: async (): Promise<AppUser> => {
-      // Mock: 从 localStorage 获取用户信息
+      // Mock: 从 localStorage 获取用户信息,实际应用中应该从后端获取
       const userJson = await AsyncStorage.getItem('currentUser');
       if (!userJson) {
         throw new Error('User not found');

@@ -3,8 +3,11 @@
 
 ## 特性
 
-- nativewind
-- expo-auth-session
+- nativewind，支持 tailwindcss方式写精美的统一样式
+- expo-auth-session，支持 oauth 登陆
+- expo-localization+i18n,国际化开箱即用
+- 轻松暗黑/亮白模式切换，支持动态切换
+- 基于文件的路由，省心，不需要配置
 
 ## 安装依赖
 
