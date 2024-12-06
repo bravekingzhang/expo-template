@@ -12,6 +12,11 @@ import useSWR from "swr";
 import { api } from "@/lib/api";
 import { useThemeStore } from "@/store/theme";
 
+/**
+ * 用户信息组件
+ * @component
+ * @returns {JSX.Element} 用户信息组件
+ */
 export default function UserProfile() {
   const router = useRouter();
   const { colorScheme } = useThemeStore();

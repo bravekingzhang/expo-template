@@ -46,7 +46,13 @@ apiClient.interceptors.request.use(
 // 应用 API 接口
 export const api = {
   auth: {
-    // 第三方登录
+    /**
+     * Authenticates user with a third-party provider
+     * @param {AuthProvider} provider - The authentication provider (e.g., 'github')
+     * @param {string} accessToken - OAuth access token from the provider
+     * @returns {Promise<AppUser>} Authenticated user information
+     * @throws {Error} If authentication fails or provider is not supported
+     */
     loginWithProvider: async (provider: AuthProvider, accessToken: string) => {
       // Mock: 直接返回转换后的用户数据，实际应该调用后端 API，创建用户
       if (provider === 'github') {
@@ -58,7 +64,11 @@ export const api = {
   },
 
   user: {
-    // 获取当前用户信息
+    /**
+     * Retrieves the current user's information from storage
+     * @returns {Promise<AppUser | null>} The current user or null if not logged in
+     * @throws {Error} If there's an error reading from storage
+     */
     getProfile: async (): Promise<AppUser> => {
       // Mock: 从 localStorage 获取用户信息,实际应用中应该从后端获取
       const userJson = await AsyncStorage.getItem('currentUser');
@@ -68,7 +78,12 @@ export const api = {
       return JSON.parse(userJson);
     },
 
-    // 更新用户信息
+    /**
+     * Updates the user's profile information
+     * @param {Partial<AppUser>} data - Partial user data to update
+     * @returns {Promise<AppUser>} Updated user information
+     * @throws {Error} If the user is not found or update fails
+     */
     updateProfile: async (data: Partial<AppUser>): Promise<AppUser> => {
       // Mock: 更新 localStorage 中的用户信息
       const userJson = await AsyncStorage.getItem('currentUser');

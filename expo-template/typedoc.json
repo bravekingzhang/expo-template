@@ -1,5 +1,5 @@
 {
-  "entryPoints": ["./app", "./components", "./lib"],
+  "entryPoints": ["./components/*", "./lib/*"],
   "out": "docs",
   "excludePrivate": true,
   "excludeProtected": true,

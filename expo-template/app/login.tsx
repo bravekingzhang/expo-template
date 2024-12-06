@@ -69,7 +69,6 @@ export default function Login() {
 
   useEffect(() => {
     console.log('Request State:', {
-      canAuthorize: githubRequest?.canAuthorize,
       responseType: githubRequest?.responseType,
       state: githubRequest?.state,
     });
