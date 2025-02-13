@@ -190,12 +190,12 @@ export default function Login() {
 
           {/* 手机号登录区域 */}
           <View className="gap-4 mb-12">
-            <View className="bg-gray-50 dark:bg-gray-800 rounded-2xl px-4 py-2.5 flex-row items-center border-2 border-gray-100 dark:border-gray-700">
+            <View className="bg-gray-50 dark:bg-gray-800 rounded-2xl px-4 flex-row items-center border-2 border-gray-100 dark:border-gray-700 h-14">
               <Text className="text-gray-600 dark:text-gray-400 mr-2 font-medium">
                 +86
               </Text>
               <TextInput
-                className="flex-1 text-gray-900 dark:text-white text-base"
+                className="flex-1 text-gray-900 dark:text-white text-base h-full"
                 placeholder="请输入手机号"
                 placeholderTextColor="#9CA3AF"
                 keyboardType="phone-pad"
@@ -206,9 +206,9 @@ export default function Login() {
             </View>
 
             <View className="flex-row">
-              <View className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-2xl px-4 py-2.5 border-2 border-gray-100 dark:border-gray-700 mr-2">
+              <View className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-2xl px-4 border-2 border-gray-100 dark:border-gray-700 mr-2 h-14 justify-center">
                 <TextInput
-                  className="text-gray-900 dark:text-white text-base"
+                  className="text-gray-900 dark:text-white text-base h-full"
                   placeholder="请输入验证码"
                   placeholderTextColor="#9CA3AF"
                   keyboardType="number-pad"
